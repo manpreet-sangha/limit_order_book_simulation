@@ -97,6 +97,9 @@ class LOBVisualiser:
         """
         Capture the first *duration_s* seconds of the simulation to a GIF.
 
+        This is **not** called by default — pass ``--gif`` on the command line
+        to trigger it explicitly.
+
         Parameters
         ----------
         next_snapshot_fn : callable () -> BookSnapshot

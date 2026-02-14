@@ -5,9 +5,9 @@ Entry point – wires together the order book engine, synthetic data
 generator, and real‑time visualiser.
 
 Run:
-    python main.py              # live interactive window
-    python main.py --gif        # save a 15‑second GIF instead
-    python main.py --gif 20     # save a 20‑second GIF
+    python main.py              # live interactive window (default)
+    python main.py --gif        # optionally save a 15‑second GIF
+    python main.py --gif 20     # optionally save a 20‑second GIF
 
 Press Ctrl+C or close the window to stop the live view.
 """
@@ -66,7 +66,9 @@ def main() -> None:
     )
     visualiser = LOBVisualiser(vis_config)
 
-    # ── 6. Choose mode: live view or GIF capture ─────────────────────
+    # ── 6. Launch ─────────────────────────────────────────────────────
+    #   Default: live interactive window
+    #   --gif [seconds]: save a GIF instead (only when explicitly requested)
     if "--gif" in sys.argv:
         idx = sys.argv.index("--gif")
         duration = float(sys.argv[idx + 1]) if idx + 1 < len(sys.argv) else 15.0

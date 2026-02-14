@@ -18,6 +18,7 @@
 - [Installation](#installation)
 - [Usage](#usage)
   - [Live Interactive Mode](#live-interactive-mode)
+  - [GIF Capture Mode (Optional)](#gif-capture-mode-optional)
   - [Smoke Tests](#smoke-tests)
 - [Visualisation Layout](#visualisation-layout)
 - [Configuration](#configuration)
@@ -47,7 +48,7 @@ The two-panel visualisation provides both a **live order book table** and an **a
 - **Two-panel live display**:
   - **Left panel** — scrolling order book table with bid/ask levels, volume bars, spread/mid-price banner, execution stats, and last-order indicator
   - **Right panel** — animated market-depth bar chart with annotations
-- **GIF capture mode** — save the first N seconds of the simulation as an animated GIF
+- **Optional GIF capture** — save the first N seconds of the simulation as an animated GIF only when explicitly requested via `--gif`
 - **Configurable synthetic data engine** with tuneable arrival rates, spread width, and volume distributions
 - **Real-time animation** at ~12.5 fps (configurable) using `matplotlib.animation.FuncAnimation`
 - **Fully reproducible** via seeded random number generators (`numpy` + stdlib `random`)
@@ -61,7 +62,7 @@ The two-panel visualisation provides both a **live order book table** and an **a
 ```
 limit order book/
 │
-├── main.py                  # Entry point — live view or GIF capture
+├── main.py                  # Entry point — live view (default) or optional GIF capture
 ├── test_smoke.py            # Headless smoke tests (no GUI required)
 ├── requirements.txt         # Python dependencies
 ├── README.md                # This file
@@ -71,7 +72,7 @@ limit order book/
 │   ├── __init__.py          # Package exports
 │   ├── order_book.py        # Core LOB engine + ExecutionStats
 │   ├── synthetic_data.py    # Synthetic order-flow generator
-│   └── visualiser.py        # Two-panel real-time visualiser
+│   └── visualiser.py        # Two-panel real-time visualiser + optional GIF export
 │
 └── limit order book visualisation market depth.png  # Reference diagram
 ```
@@ -116,6 +117,17 @@ python main.py
 ```
 
 Opens an interactive matplotlib window with the two-panel display. The order book updates continuously with synthetic orders. **Close the window or press `Ctrl+C` to stop.**
+
+### GIF Capture Mode (Optional)
+
+> **No GIF is created by default.** You must explicitly pass `--gif` to save one.
+
+```bash
+python main.py --gif          # Save a 15-second GIF (default duration)
+python main.py --gif 20       # Save a 20-second GIF
+```
+
+Renders the simulation headlessly and saves to `lob_simulation.gif`. Requires `Pillow` (install with `pip install Pillow`).
 
 ### Smoke Tests
 
@@ -265,6 +277,7 @@ The `save_gif()` method renders a fixed number of frames and writes them to a GI
 |---|---|---|
 | `matplotlib` | ≥ 3.7 | Real-time animated visualisation |
 | `numpy` | ≥ 1.24 | Fast random number generation & array ops |
+| `Pillow` | ≥ 9.0 | GIF export *(optional — only needed when using `--gif`)* |
 
 ---
 
