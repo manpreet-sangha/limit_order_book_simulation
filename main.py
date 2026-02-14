@@ -5,10 +5,14 @@ Entry point – wires together the order book engine, synthetic data
 generator, and real‑time visualiser.
 
 Run:
-    python main.py
+    python main.py              # live interactive window
+    python main.py --gif        # save a 15‑second GIF instead
+    python main.py --gif 20     # save a 20‑second GIF
 
-Press Ctrl+C or close the window to stop.
+Press Ctrl+C or close the window to stop the live view.
 """
+
+import sys
 
 from src.order_book import LimitOrderBook
 from src.synthetic_data import SyntheticOrderGenerator, GeneratorConfig
@@ -53,14 +57,25 @@ def main() -> None:
 
     # ── 5. Configure & launch the real‑time visualiser ───────────────
     vis_config = VisualiserConfig(
-        fig_width=14,
-        fig_height=7,
+        fig_width=18,
+        fig_height=8,
         max_levels=12,
+        table_levels=10,
         interval_ms=80,       # ≈ 12.5 updates / second
         title="Limit Order Book – Real‑Time Market Depth",
     )
     visualiser = LOBVisualiser(vis_config)
-    visualiser.start(next_snapshot)       # blocks until window is closed
+
+    # ── 6. Choose mode: live view or GIF capture ─────────────────────
+    if "--gif" in sys.argv:
+        idx = sys.argv.index("--gif")
+        duration = float(sys.argv[idx + 1]) if idx + 1 < len(sys.argv) else 15.0
+        visualiser.save_gif(next_snapshot,
+                            filepath="lob_simulation.gif",
+                            duration_s=duration,
+                            fps=12)
+    else:
+        visualiser.start(next_snapshot)   # blocks until window is closed
 
 
 if __name__ == "__main__":

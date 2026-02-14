@@ -14,6 +14,7 @@ from src.order_book import (
     OrderType,
     Side,
     BookSnapshot,
+    ExecutionStats,
 )
 from src.synthetic_data import (
     SyntheticOrderGenerator,
@@ -31,6 +32,7 @@ __all__ = [
     "OrderType",
     "Side",
     "BookSnapshot",
+    "ExecutionStats",
     # synthetic_data
     "SyntheticOrderGenerator",
     "GeneratorConfig",

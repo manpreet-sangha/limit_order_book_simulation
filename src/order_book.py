@@ -36,6 +36,18 @@ class Order:
     volume: float = 0.0
 
 
+# ── execution statistics ──────────────────────────────────────────────────
+@dataclass
+class ExecutionStats:
+    """Running counters updated after every order processed."""
+    total_orders: int = 0
+    limit_orders: int = 0
+    market_orders: int = 0
+    cancel_orders: int = 0
+    total_volume_filled: float = 0.0    # cumulative market‑order fills
+    last_order: Optional["Order"] = None
+
+
 # ── snapshot returned after every update ─────────────────────────────────
 @dataclass
 class BookSnapshot:
@@ -49,6 +61,7 @@ class BookSnapshot:
     mid_price: Optional[float]
     spread: Optional[float]
     timestamp: float = 0.0
+    stats: Optional[ExecutionStats] = None
 
 
 # ── limit order book ─────────────────────────────────────────────────────
@@ -65,6 +78,7 @@ class LimitOrderBook:
         self._bids: Dict[float, float] = {}
         self._asks: Dict[float, float] = {}
         self._time: float = 0.0
+        self._stats = ExecutionStats()
 
     # ── properties ───────────────────────────────────────────────────
     @property
@@ -101,10 +115,12 @@ class LimitOrderBook:
             if book[price] <= 1e-12:
                 del book[price]
 
-    def _execute_market(self, side: Side, volume: float) -> None:
+    def _execute_market(self, side: Side, volume: float) -> float:
         """
         A market BUY eats into the ASK side (lowest prices first).
         A market SELL eats into the BID side (highest prices first).
+
+        Returns the total volume actually filled.
         """
         if side is Side.BID:
             book = self._asks
@@ -114,6 +130,7 @@ class LimitOrderBook:
             sorter = sorted(book.keys(), reverse=True)  # descending
 
         remaining = volume
+        filled_total = 0.0
         for price in sorter:
             if remaining <= 0:
                 break
@@ -121,19 +138,27 @@ class LimitOrderBook:
             filled = min(available, remaining)
             book[price] -= filled
             remaining -= filled
+            filled_total += filled
             if book[price] <= 1e-12:
                 del book[price]
+        return filled_total
 
     # ── public API ───────────────────────────────────────────────────
     def process_order(self, order: Order, timestamp: float = 0.0) -> BookSnapshot:
         """Apply an order and return a new snapshot of the book."""
         self._time = timestamp
+        self._stats.total_orders += 1
+        self._stats.last_order = order
 
         if order.order_type is OrderType.LIMIT:
+            self._stats.limit_orders += 1
             self._add_limit(order.side, order.price, order.volume)
         elif order.order_type is OrderType.MARKET:
-            self._execute_market(order.side, order.volume)
+            self._stats.market_orders += 1
+            filled = self._execute_market(order.side, order.volume)
+            self._stats.total_volume_filled += filled
         elif order.order_type is OrderType.CANCEL:
+            self._stats.cancel_orders += 1
             self._cancel(order.side, order.price, order.volume)
 
         return self.snapshot(timestamp)
@@ -152,9 +177,18 @@ class LimitOrderBook:
             mid_price=self.mid_price,
             spread=self.spread,
             timestamp=timestamp,
+            stats=ExecutionStats(
+                total_orders=self._stats.total_orders,
+                limit_orders=self._stats.limit_orders,
+                market_orders=self._stats.market_orders,
+                cancel_orders=self._stats.cancel_orders,
+                total_volume_filled=self._stats.total_volume_filled,
+                last_order=self._stats.last_order,
+            ),
         )
 
     def reset(self) -> None:
         self._bids.clear()
         self._asks.clear()
         self._time = 0.0
+        self._stats = ExecutionStats()
