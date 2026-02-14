@@ -4,6 +4,8 @@
 
 ![Market Depth Visualisation](limit%20order%20book%20visualisation%20market%20depth.png)
 
+![Real-Time Simulation](lob_simulation.gif)
+
 > **Citation:** Antonio Briola, Jeremy Turiel, Riccardo Marcaccioli, Alvaro Cauderan & Tomaso Aste, 2021. "Deep Reinforcement Learning for Active High Frequency Trading," Papers 2101.07107, arXiv.org, revised Aug 2023. [[arXiv](https://arxiv.org/abs/2101.07107)]
 
 ---
@@ -16,7 +18,6 @@
 - [Installation](#installation)
 - [Usage](#usage)
   - [Live Interactive Mode](#live-interactive-mode)
-  - [GIF Capture Mode](#gif-capture-mode)
   - [Smoke Tests](#smoke-tests)
 - [Visualisation Layout](#visualisation-layout)
 - [Configuration](#configuration)
@@ -70,9 +71,8 @@ limit order book/
 │   ├── __init__.py          # Package exports
 │   ├── order_book.py        # Core LOB engine + ExecutionStats
 │   ├── synthetic_data.py    # Synthetic order-flow generator
-│   └── visualiser.py        # Two-panel real-time visualiser + GIF export
+│   └── visualiser.py        # Two-panel real-time visualiser
 │
-├── lob_simulation.gif                              # Captured simulation GIF
 └── limit order book visualisation market depth.png  # Reference diagram
 ```
 
@@ -116,15 +116,6 @@ python main.py
 ```
 
 Opens an interactive matplotlib window with the two-panel display. The order book updates continuously with synthetic orders. **Close the window or press `Ctrl+C` to stop.**
-
-### GIF Capture Mode
-
-```bash
-python main.py --gif          # Save a 15-second GIF (default)
-python main.py --gif 20       # Save a 20-second GIF
-```
-
-Renders the simulation headlessly and saves to `lob_simulation.gif`. Uses Pillow as the writer at 12 fps.
 
 ### Smoke Tests
 
@@ -274,7 +265,6 @@ The `save_gif()` method renders a fixed number of frames and writes them to a GI
 |---|---|---|
 | `matplotlib` | ≥ 3.7 | Real-time animated visualisation |
 | `numpy` | ≥ 1.24 | Fast random number generation & array ops |
-| `Pillow` | ≥ 9.0 | GIF export (optional — only needed for `--gif` mode) |
 
 ---
 
