@@ -4,9 +4,9 @@
 
 ![Market Depth Visualisation](limit%20order%20book%20visualisation%20market%20depth.png)
 
-![Real-Time Simulation](lob_simulation.gif)
-
 > **Citation:** Antonio Briola, Jeremy Turiel, Riccardo Marcaccioli, Alvaro Cauderan & Tomaso Aste, 2021. "Deep Reinforcement Learning for Active High Frequency Trading," Papers 2101.07107, arXiv.org, revised Aug 2023. [[arXiv](https://arxiv.org/abs/2101.07107)]
+
+![Real-Time Simulation](lob_simulation.gif)
 
 ---
 
@@ -74,6 +74,7 @@ limit order book/
 │   ├── synthetic_data.py    # Synthetic order-flow generator
 │   └── visualiser.py        # Two-panel real-time visualiser + optional GIF export
 │
+├── lob_simulation.gif                              # Animated simulation demo
 └── limit order book visualisation market depth.png  # Reference diagram
 ```
 
@@ -250,7 +251,7 @@ Uses `matplotlib.animation.FuncAnimation` to redraw every `interval_ms` millisec
 2. **Left panel** — redraws the order book table, spread banner, execution statistics, and last-order indicator
 3. **Right panel** — redraws bid bars (upward, orange) and ask bars (downward, blue) with reference lines and annotations
 
-The `save_gif()` method renders a fixed number of frames and writes them to a GIF file using the Pillow writer.
+The `save_gif()` method is available for optional GIF export — it renders a fixed number of frames and writes them to a GIF file using the Pillow writer. It is only invoked when the `--gif` flag is passed on the command line.
 
 ---
 
